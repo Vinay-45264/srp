@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Leave Approval</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #message-box {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f0fdf4;
+            color: #15803d;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #16a34a;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+        #message-box.show {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-roboto">
+    <div class="container mx-auto p-6 sm:p-10 md:p-12 lg:p-16">
+        <h1 class="text-2xl font-semibold text-gray-800 mb-6">Leave Applications</h1>
+
+        <div id="message-box" class="hidden"></div>
+        <div id="leave-applications-list" class="bg-white shadow-md rounded-lg p-4 sm:p-6">
+            <p class="text-gray-500 italic">Loading leave applications...</p>
+        </div>
+    </div>
+
+    <script>
+        const leaveApplicationsList = document.getElementById('leave-applications-list');
+        const messageBox = document.getElementById('message-box');
+
+        function showMessage(message, type = 'success') {
+            messageBox.textContent = message;
+            messageBox.className = `fixed top-4 left-1/2 transform -translate-x-1/2 bg-${type === 'success' ? 'green' : 'red'}-100 text-${type === 'success' ? 'green' : 'red'}-700 border border-${type === 'success' ? 'green' : 'red'}-400 px-4 py-2 rounded shadow-md z-50`;
+            messageBox.classList.add('show');
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 3000);
+        }
+
+        function displayLeaveApplications(applications) {
+            if (applications.length === 0) {
+                leaveApplicationsList.innerHTML = `<p class="text-gray-500 italic">No leave applications found for your department.</p>`;
+                return;
+            }
+
+            let html = '<div class="space-y-4">';
+            applications.forEach(application => {
+                html += `
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600"><strong>Faculty:</strong> <span class="text-blue-700 font-medium">${application.faculty_name}</span></p>
+                            <p class="text-sm text-gray-600"><strong>Department:</strong> <span class="text-indigo-700 font-medium">${application.department}</span></p>
+                            <p class="text-sm text-gray-600"><strong>Type:</strong> <span class="text-purple-700 font-medium">${application.leave_type}</span></p>
+                            <p class="text-sm text-gray-600"><strong>Start Date:</strong> <span class="text-green-700 font-medium">${application.start_date}</span></p>
+                            <p class="text-sm text-gray-600"><strong>End Date:</strong> <span class="text-red-700 font-medium">${application.end_date}</span></p>
+                            <p class="text-sm text-gray-600"><strong>Reason:</strong> <span class="text-gray-800 font-medium">${application.reason}</span></p>
+                            <p class="text-sm text-gray-600"><strong>Status:</strong> <span class="${getStatusColor(application.status)} font-medium">${application.status}</span></p>
+                            ${application.replacement_faculty_name ? `<p class="text-sm text-gray-600"><strong>Replacement:</strong> <span class="text-teal-700 font-medium">${application.replacement_faculty_name}</span></p>` : ''}
+                        </div>
+                        <div class="mt-4 sm:mt-0 flex gap-2">
+                            <button
+                                class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline text-sm"
+                                onclick="approveLeave(${application.application_id})"
+                            >
+                                Approve
+                            </button>
+                            <button
+                                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline text-sm"
+                                onclick="rejectLeave(${application.application_id})"
+                            >
+                                Reject
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            leaveApplicationsList.innerHTML = html;
+        }
+
+        function getStatusColor(status) {
+            switch (status) {
+                case 'Pending': return 'text-yellow-600';
+                case 'Approved': return 'text-green-600';
+                case 'Rejected': return 'text-red-600';
+                default: return 'text-gray-600';
+            }
+        }
+
+        async function approveLeave(leaveId) {
+            try {
+                const response = await fetch(`/admin/leave/approve/${leaveId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ replacementFacultyEmail: "some_email@example.com" }) //Added a replacement email
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage(data.message, 'success');
+                    fetchLeaveApplications();
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('An error occurred while approving the leave.', 'error');
+                console.error('Error:', error);
+            }
+        }
+
+        async function rejectLeave(leaveId) {
+            try {
+                const response = await fetch(`/admin/leave/reject/${leaveId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage(data.message, 'success');
+                    fetchLeaveApplications();
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('An error occurred while rejecting the leave.', 'error');
+                console.error('Error:', error);
+            }
+        }
+
+        async function fetchLeaveApplications() {
+            try {
+                const response = await fetch('/admin/leaves');
+                const data = await response.json();
+                if (response.ok) {
+                    displayLeaveApplications(data);
+                } else {
+                    leaveApplicationsList.innerHTML = `<p class="text-red-500">Error: ${data.message}</p>`;
+                }
+            } catch (error) {
+                leaveApplicationsList.innerHTML = `<p class="text-red-500">An error occurred while fetching leave applications.</p>`;
+                console.error('Error:', error);
+            }
+        }
+
+        fetchLeaveApplications();
+    </script>
+</body>
+</html>

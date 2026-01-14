@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Profile</title>
+    <link rel="stylesheet" href="styles/profile.css">
+    <link rel="stylesheet" href="styles/login-signup.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <script>
+        function getUserRole() {
+            return localStorage.getItem('userRole');
+        }
+    </script>
+</head>
+<body>
+    <div class="top">
+        <div>
+            <a class="web-name" href="">Faculty Leave Management System</a>
+        </div>
+        <div id="header-buttons" style="display: flex; gap: 10px;">
+            <a class="log-sign web-name" href="javascript:void(0);" onclick="logout()">Logout</a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="box">
+            <h2>Your Profile</h2>
+            <button id="leaves-button" class="apply-leave-btn" onclick="window.location.href='admin_leave_approval.html'" style="display: none;">Leaves</button>
+            <button class="apply-leave-btn" onclick="openModal()">Apply Leave</button>
+            <button class="add-timetable-btn" onclick="window.location.href='timetable.html'">Add Timetable</button>
+            <button class="update-salary-btn add-timetable-btn" onclick="openSalaryModal()">Update Salary</button>
+            <table class="profile-table">
+                <tr>
+                    <td><strong>Username:</strong></td>
+                    <td><span id="username">Loading...</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Email:</strong></td>
+                    <td><span id="email">Loading...</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Department:</strong></td>
+                    <td><span id="department">Loading...</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Max Leaves:</strong></td>
+                    <td><span id="max_leaves">Loading...</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Total Leaves:</strong></td>
+                    <td><span id="total_leaves">Loading...</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Salary:</strong></td>
+                    <td><span id="salary">Loading...</span></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id="leaveModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Apply for Leave</h3>
+            <form id="leaveForm">
+                <label for="leaveType">Leave Type:</label>
+                <select id="leaveType" required>
+                    <option value="Casual Leave">Casual Leave</option>
+                    <option value="Sick Leave">Sick Leave</option>
+                    <option value="Maternity Leave">Maternity Leave</option>
+                    <option value="On-Duty">On-Duty</option>
+                    <option value="Optional Holiday">Optional Holiday</option>
+                    <option value="Leave on Loss of Pay">Leave on Loss of Pay</option>
+                </select>
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" required>
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" required>
+                <label for="reason">Reason:</label>
+                <textarea id="reason" rows="3" required></textarea>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+    <div id="salaryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSalaryModal()">&times;</span>
+            <h3>Update Salary</h3>
+            <form id="salaryForm">
+                <label for="newSalary">New Salary:</label>
+                <input type="number" id="newSalary" required>
+                <button type="submit">Update</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        function logout() {
+            fetch('http://localhost:5201/logout', {
+                method: 'POST'
+            })
+            .then(res => {
+                if (res.ok) {
+                    localStorage.removeItem('userEmail');
+                    localStorage.removeItem('userRole');
+                    window.location.href = 'login-signup.html';
+                } else {
+                    alert("Logout failed. Please try again.");
+                }
+            })
+            .catch(error => {
+                console.error('Logout error:', error);
+                alert("Error logging out. Try again.");
+            });
+        }
+
+        const userEmail = localStorage.getItem('userEmail');
+        const userRole = localStorage.getItem('userRole');
+
+        function fetchProfileData() {
+            fetch(`http://localhost:5201/profile?email=${encodeURIComponent(userEmail)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.username) {
+                    document.getElementById('username').textContent = data.username;
+                    document.getElementById('email').textContent = data.email;
+                    document.getElementById('department').textContent = data.department;
+                    document.getElementById('max_leaves').textContent = data.max_leaves;
+                    document.getElementById('total_leaves').textContent = data.total_leaves;
+                    document.getElementById('salary').textContent = data.salary;
+                    if (userRole === 'admin') {
+                        document.getElementById('leaves-button').style.display = 'block';
+                    }
+                } else {
+                    alert("User not found");
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching profile:', error);
+                alert("Error fetching profile data. Try again.");
+            });
+        }
+
+        fetchProfileData();
+
+        function openModal() {
+            document.getElementById('leaveModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('leaveModal').style.display = 'none';
+        }
+
+        function openSalaryModal() {
+            document.getElementById('salaryModal').style.display = 'flex';
+        }
+
+        function closeSalaryModal() {
+            document.getElementById('salaryModal').style.display = 'none';
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('startDate').setAttribute('min', today);
+        document.getElementById('endDate').setAttribute('min', today);
+
+        document.getElementById('leaveForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const leaveType = document.getElementById('leaveType').value;
+            const reason = document.getElementById('reason').value;
+
+            if (startDate < today || endDate < today) {
+                alert("You cannot select past dates for leave.");
+                return;
+            }
+
+            if (startDate > endDate) {
+                alert("Start date cannot be after End date.");
+                return;
+            }
+
+            const leaveData = {
+                email: localStorage.getItem('userEmail'),
+                type: leaveType,
+                startDate: startDate,
+                endDate: endDate,
+                reason: reason,
+            };
+
+            fetch('http://localhost:5201/apply-leave', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(leaveData)
+            })
+            .then(res => res.json())
+            .then(response => {
+                alert(response.message);
+                closeModal();
+                document.getElementById('leaveForm').reset();
+                fetchProfileData();
+            })
+            .catch(error => {
+                console.error('Error applying leave:', error);
+                alert("Error submitting leave. Try again.");
+            });
+        });
+
+        document.getElementById('salaryForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const newSalary = document.getElementById('newSalary').value;
+            fetch('http://localhost:5201/update-salary', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: userEmail,
+                    newSalary: parseInt(newSalary)
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                closeSalaryModal();
+                fetchProfileData();
+            })
+            .catch(error => {
+                console.error('Error updating salary:', error);
+                alert("Error updating salary. Please try again.");
+            });
+        });
+
+        if (userRole === 'admin') {
+            document.getElementById('leaves-button').style.display = 'block';
+        }
+    </script>
+
+</body>
+</html>

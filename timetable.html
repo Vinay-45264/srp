@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Timetable</title>
+    <link rel="stylesheet" href="styles/timetable.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body style="padding-bottom: 100px; padding-top: 100px;">
+    <div class="container">
+        <div class="box">
+            <h2>Add Class to Timetable</h2>
+            <form id="timetableForm">
+                <label>Day of the Week:</label>
+                <select name="day_of_week" required>
+                    <option value="">--Select--</option>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                </select>
+
+                <label>Start Time:</label>
+                <input type="time" name="start_time" required>
+
+                <label>End Time:</label>
+                <input type="time" name="end_time" required>
+
+                <label>Subject:</label>
+                <input type="text" name="subject" required>
+
+                <label>Room Number:</label>
+                <input type="text" name="room_number" required>
+
+                <button type="submit">+ Add Class</button>
+            </form>
+            <p id="timetable-msg" style="margin-top: 10px; color: green;"></p>
+        </div>
+
+        <div class="timetable-box">
+            <h3>Your Timetable</h3>
+            <table id="timetable">
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Subject</th>
+                        <th>Room</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="timetable-list">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const timetableForm = document.getElementById('timetableForm');
+            const timetableList = document.getElementById('timetable-list');
+            const timetableMsg = document.getElementById('timetable-msg');
+
+            function fetchTimetable() {
+                fetch('http://localhost:5201/timetable', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+
+                    },
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    updateTimetableDisplay(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching timetable:', error);
+                    timetableMsg.style.color = 'red';
+                    timetableMsg.textContent = 'Failed to load timetable.';
+                });
+            }
+
+    
+            function updateTimetableDisplay(timetableData) {
+                timetableList.innerHTML = '';
+
+                timetableData.forEach(function(classEntry) {
+                    const row = document.createElement('tr');
+
+                    const dayCell = document.createElement('td');
+                    dayCell.textContent = classEntry.day_of_week;
+                    row.appendChild(dayCell);
+
+                    const startTimeCell = document.createElement('td');
+                    startTimeCell.textContent = classEntry.start_time;
+                    row.appendChild(startTimeCell);
+
+                    const endTimeCell = document.createElement('td');
+                    endTimeCell.textContent = classEntry.end_time;
+                    row.appendChild(endTimeCell);
+
+                    const subjectCell = document.createElement('td');
+                    subjectCell.textContent = classEntry.subject;
+                    row.appendChild(subjectCell);
+
+                    const roomNumberCell = document.createElement('td');
+                    roomNumberCell.textContent = classEntry.room_number;
+                    row.appendChild(roomNumberCell);
+
+                    const deleteCell = document.createElement('td');
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.dataset.scheduleId = classEntry.schedule_id; 
+                    deleteBtn.onclick = function() {
+                        const scheduleId = this.dataset.scheduleId;
+                        deleteClass(scheduleId);
+                    };
+                    deleteCell.appendChild(deleteBtn);
+                    row.appendChild(deleteCell);
+
+                    timetableList.appendChild(row);
+                });
+            }
+
+
+            function deleteClass(scheduleId) {
+                fetch(`http://localhost:5201/timetable/delete/${scheduleId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.message === 'Class deleted successfully') {
+                        fetchTimetable(); 
+                        timetableMsg.style.color = 'green';
+                        timetableMsg.textContent = 'Class deleted successfully!';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting class:', error);
+                    timetableMsg.style.color = 'red';
+                    timetableMsg.textContent = 'Failed to delete class.';
+                });
+            }
+
+
+            fetchTimetable();
+
+            timetableForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const dayOfWeek = timetableForm.querySelector('[name="day_of_week"]').value;
+                const startTime = timetableForm.querySelector('[name="start_time"]').value;
+                const endTime = timetableForm.querySelector('[name="end_time"]').value;
+                const subject = timetableForm.querySelector('[name="subject"]').value;
+                const roomNumber = timetableForm.querySelector('[name="room_number"]').value; 
+
+                if (!dayOfWeek || !startTime || !endTime || !subject || !roomNumber) {
+                    timetableMsg.style.color = 'red';
+                    timetableMsg.textContent = 'Please fill in all fields.';
+                    return;
+                }
+
+                const newClass = {
+                    day_of_week: dayOfWeek,
+                    start_time: startTime,
+                    end_time: endTime,
+                    subject: subject,
+                    room_number: roomNumber 
+                };
+
+                fetch('http://localhost:5201/timetable/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(newClass),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    timetableMsg.style.color = 'green';
+                    timetableMsg.textContent = 'Class added successfully!';
+                    timetableForm.reset();
+                    fetchTimetable(); 
+                })
+                .catch(error => {
+                    console.error('Error adding class:', error);
+                    timetableMsg.style.color = 'red';
+                    timetableMsg.textContent = 'Failed to add class.';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

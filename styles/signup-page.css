@@ -1,0 +1,207 @@
+/* *{
+    margin: 0;
+    font-family: 'Roboto',sans-serif;
+}
+
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+
+.top{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgb(128, 0, 248);
+    padding: 25px;
+
+}
+
+.web-name{
+    background-color: white;
+    color: rgb(17, 11, 22);
+    padding: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 12px;
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.inputs{
+    display: block;
+    margin: 20px;
+    margin: 0;
+    margin-top: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 7px;
+    width: 100%;
+    margin-bottom: 20px;
+    border-width: 1px;
+    height: 30px;
+    border-radius: 5px;
+    border-style: solid;
+    outline: none;
+}
+
+.inputs:focus{
+    border-color:rgb(128, 0, 248); ;
+}
+
+.box {
+    background: white;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    border-radius: 15px;
+    box-shadow: 0px 0px 10px 10px rgb(128, 0, 248,0.2);
+    width: 350px;
+    transition: transform 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.box:hover{
+    transform: scale(1.05);
+}
+
+.login-button{
+    background-color:rgb(128, 0, 248);
+    color: white ;
+    font-weight: bold;
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+}
+
+.login-button:hover{
+    transform: scale(1.2);
+} */
+
+* {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f4f4f4; /* Added a light background for better contrast */
+}
+
+.top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgb(128, 0, 248);
+    padding: 25px;
+}
+
+.web-name {
+    background-color: white;
+    color: rgb(17, 11, 22);
+    padding: 10px 20px; /* Adjusted padding for better spacing */
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 12px;
+    transition: background-color 0.3s ease; /* Added transition for hover effect */
+}
+
+.web-name:hover {
+    background-color: #eee; /* Slightly lighter on hover */
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px; /* Added some padding around the container */
+}
+
+.inputs {
+    display: block;
+    margin-top: 20px;
+    padding: 10px 7px;
+    width: calc(100% - 14px); /* Adjusted width to account for padding and border */
+    margin-bottom: 20px;
+    border: 1px solid #ccc; /* Changed border color to a softer gray */
+    height: 30px; /* Explicit height might not be ideal for select */
+    border-radius: 5px;
+    outline: none;
+    box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+}
+
+/* Style specifically for the select dropdown */
+select.inputs {
+    appearance: none; /* Remove default arrow */
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg fill="%23343a40" viewBox="0 0 4 5"><path d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>'); /* Custom arrow */
+    background-repeat: no-repeat;
+    background-position-x: calc(100% - 10px);
+    background-position-y: 50%;
+    padding-right: 30px; /* Make space for the custom arrow */
+    height: auto; /* Adjust height automatically */
+    line-height: 1.5; /* Improve text spacing */
+}
+
+select.inputs::-ms-expand {
+    display: none; /* Hide default arrow in IE/Edge */
+}
+
+.inputs:focus {
+    border-color: rgb(128, 0, 248);
+    box-shadow: 0 0 5px rgba(128, 0, 248, 0.5); /* Added a subtle focus shadow */
+}
+
+.box {
+    background: white;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    border-radius: 15px;
+    box-shadow: 0px 0px 10px rgba(128, 0, 248, 0.2); /* Softened the shadow */
+    width: 350px;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Added shadow transition */
+    cursor: pointer;
+}
+
+.box:hover {
+    transform: scale(1.02); /* Reduced scale slightly */
+    box-shadow: 0px 0px 15px rgba(128, 0, 248, 0.3); /* Slightly stronger shadow on hover */
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 25px; /* Added margin below the heading */
+    color: #333; /* Darker heading color */
+}
+
+.login-button {
+    background-color: rgb(128, 0, 248);
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px; /* Adjusted padding */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease-in-out; /* Added background transition */
+    font-size: 1em; /* Slightly increased font size */
+}
+
+.login-button:hover {
+    background-color: #6c00b3; /* Darker shade on hover */
+    transform: scale(1.05); /* Reduced scale slightly */
+}

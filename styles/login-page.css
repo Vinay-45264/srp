@@ -1,0 +1,90 @@
+*{
+    margin: 0;
+    font-family: 'Roboto',sans-serif;
+}
+
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+
+.top{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgb(128, 0, 248);
+    padding: 25px;
+
+}
+
+.web-name{
+    background-color: white;
+    color: rgb(17, 11, 22);
+    padding: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 12px;
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.inputs{
+    display: block;
+    margin: 20px;
+    margin: 0;
+    margin-top: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 7px;
+    width: 100%;
+    margin-bottom: 20px;
+    border-width: 1px;
+    height: 30px;
+    border-radius: 5px;
+    border-style: solid;
+    outline: none;
+}
+
+.inputs:focus{
+    border-color:rgb(128, 0, 248); ;
+}
+
+.box {
+    background: white;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    border-radius: 15px;
+    box-shadow: 0px 0px 10px 10px rgb(128, 0, 248,0.2);
+    width: 350px;
+    transition: transform 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.box:hover{
+    transform: scale(1.05);
+}
+
+.login-button{
+    background-color:rgb(128, 0, 248);
+    color: white ;
+    font-weight: bold;
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+}
+
+.login-button:hover{
+    transform: scale(1.2);
+}

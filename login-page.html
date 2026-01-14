@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/login-page.css">
+    <title>Login</title>
+</head>
+<body>
+    <div class="top">
+        <div>
+            <a class="web-name" href="login-signup.html">Faculty Leave Management System </a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="box">
+            <h2>Login</h2>
+            <form id="login-form">
+                <input type="text" id="username" class="inputs" placeholder="Username" required>
+                <input type="password" id="password" class="inputs" placeholder="Password" required>
+                <button type="submit" class="login-button">Login</button>
+            </form>            
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('http://localhost:5201/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('userEmail', data.email);
+                    localStorage.setItem('userRole', data.role); 
+                    window.location.href = 'profile.html';
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.message || 'Login failed');
+                }
+            } catch (error) {
+                console.error('Error during login:', error);
+                alert('An error occurred while logging in.');
+            }
+        });
+    </script>
+</body>
+</html>

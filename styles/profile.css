@@ -1,0 +1,192 @@
+ *{
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f7f7f7;
+    padding-bottom: 300px;
+}
+
+
+
+.container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.box {
+    background: white;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    border-radius: 15px;
+    box-shadow: 0px 0px 10px 10px rgba(128, 0, 248, 0.2);
+    width: 100%;
+    max-width: 400px;
+    animation: fadeIn 1s ease-out;
+    transition: transform 0.3s ease-in-out;
+}
+
+.box:hover{
+    transform: scale(1.05);
+}
+
+/* might be deleted in future */
+.top{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgb(128, 0, 248);
+    padding: 25px;
+
+}
+
+.web-name{
+    background-color: white;
+    color: rgb(17, 11, 22);
+    padding: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 12px;
+}
+/* might be deleted in future */
+
+h2 {
+    font-size: 24px;
+    color: rgb(128, 0, 248);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.profile-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.profile-table td {
+    padding: 12px;
+    vertical-align: middle;
+    font-size: 16px;
+    text-align: left;
+    line-height: 1.5;
+}
+
+.profile-table td:first-child {
+    font-weight: bold;
+    color: rgb(128, 0, 248);
+}
+
+.profile-table td:last-child {
+    color: rgb(17, 11, 22);
+}
+
+.profile-table tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+.profile-table tr:hover {
+    background-color: rgba(128, 0, 248, 0.1);
+    cursor: pointer;
+}
+
+.profile-table td span {
+    font-weight: normal;
+    color: rgb(17, 11, 22);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.apply-leave-btn,.add-timetable-btn {
+    margin-bottom: 15px;
+    padding: 10px 20px;
+    background-color: rgb(128, 0, 248);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.apply-leave-btn:hover,.add-timetable-btn:hover {
+    transform: scale(1.05);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.4);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    width: 350px;
+    box-shadow: 0 4px 20px rgba(128, 0, 248, 0.3);
+    position: relative;
+    font-family: 'Roboto', sans-serif;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: rgb(128, 0, 248);
+}
+
+.modal-content label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline-color: rgb(128, 0, 248);
+}
+
+.modal-content button {
+    margin-top: 15px;
+    width: 100%;
+    padding: 10px;
+    background-color: rgb(128, 0, 248);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.modal-content .close {
+    position: absolute;
+    top: 10px; right: 15px;
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+} 
+
+
