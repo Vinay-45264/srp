@@ -27,10 +27,9 @@ A simple Node.js + MySQL web app for managing faculty profiles, timetables, and 
 - [.env](.env): Environment variables (not committed)
 - [.gitignore](.gitignore): Ignores `.env`, `node_modules`, and `queries.txt`
 
-> Note: `admin_leave_approval.html` is intentionally not covered here per request.
 
 ## Environment Variables
-Place a `.env` at repo root. Current app uses these keys:
+ Current app uses these keys:
 ```
 HOST=localhost
 USER=your_mysql_username
