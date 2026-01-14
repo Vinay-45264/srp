@@ -1,13 +1,13 @@
 # Faculty Leave Management System
 
-A simple Node.js + MySQL web app for managing faculty profiles, timetables, and leave applications with basic authentication and session management. Frontend is plain HTML/CSS/JS served statically; backend is Express.
+A web application for faculty to manage leave applications, timetables, and profile information. Built with Node.js/Express and MySQL, with a vanilla HTML/CSS/JS frontend.
 
 ## Features
-- Authentication: Signup (with bcrypt-hashed passwords) and Login using sessions.
-- Profile: View username, email, department, role, salary, max and total leaves.
-- Timetable: Add, list, and delete class entries per user.
-- Leave Application: Apply for leave across a date range; auto-checks replacement availability based on timetable; auto-increments total leaves on approval.
-- Salary Update: Update salary from profile view.
+- **User Authentication** - Register and login with secure password hashing
+- **Profile Management** - View and update profile info, salary, and leave balance
+- **Timetable Management** - Add and manage class schedules
+- **Leave Requests** - Apply for leave with automatic replacement faculty checking
+- **Salary Updates** - Update salary from your profile
 
 ## Tech Stack
 - Backend: Express, mysql2, express-session, body-parser, cors, dotenv, bcrypt
@@ -15,31 +15,31 @@ A simple Node.js + MySQL web app for managing faculty profiles, timetables, and 
 - Database: MySQL
 
 ## File Structure
-- [server.js](server.js): Express app, routes, MySQL connection, session setup
-- [package.json](package.json): Dependencies
-- [package-lock.json](package-lock.json): Locked dependency versions
-- [login-signup.html](login-signup.html): Landing page with links to Login/Signup
-- [login-page.html](login-page.html): Login form (fetches `/login`)
-- [signup-page.html](signup-page.html): Signup form (posts to `/signup`)
-- [profile.html](profile.html): Profile dashboard; apply leave, update salary, navigate to timetable
-- [timetable.html](timetable.html): Manage timetable entries and list current timetable
-- [styles/](styles): Page-specific stylesheets
-- [.env](.env): Environment variables (not committed)
-- [.gitignore](.gitignore): Ignores `.env`, `node_modules`, and `queries.txt`
-
+```
+├── server.js              # Express backend
+├── package.json           # Dependencies
+├── login-signup.html      # Welcome page
+├── login-page.html        # Login
+├── signup-page.html       # Registration
+├── profile.html           # Dashboard
+├── timetable.html         # Class schedule
+├── styles/                # CSS files
+├── .env                   # Configuration (not in repo)
+└── .gitignore
+```
 
 ## Environment Variables
- Current app uses these keys:
+Create a `.env` file in the project root:
 ```
 HOST=localhost
-USER=your_mysql_username
+USER=your_mysql_user
 PASSWORD=your_mysql_password
 DATABASE=faculty_leave
 PORT=5201
 ```
 
-## Database Schema (example)
-The server expects the following tables/columns based on queries in [server.js](server.js). Adjust types as needed.
+## Database Setup
+Create these tables in MySQL:
 
 ```sql
 -- Users
@@ -48,7 +48,7 @@ CREATE TABLE signup (
   username VARCHAR(100) NOT NULL,
   email VARCHAR(255) NOT NULL UNIQUE,
   department ENUM('AIML','DS','IT','CSE','MECHANICAL') NOT NULL,
-  password VARCHAR(255) NOT NULL, -- bcrypt hash
+  password VARCHAR(255) NOT NULL,
   role ENUM('faculty','admin') NOT NULL,
   salary INT DEFAULT 0,
   max_leaves INT DEFAULT 10,
@@ -80,73 +80,42 @@ CREATE TABLE leave_applications (
 ```
 
 ## API Endpoints
-All endpoints served by [server.js](server.js). Sessions are used for auth; protected routes require a successful login.
 
-- POST `/signup`
-  - Body: `{ username, email, department, password, confirmPassword, role, salary? }`
-  - Validates department/role; hashes password; creates user; redirects to `/login-page.html`.
+**Auth**
+- `POST /signup` - Register a new account
+- `POST /login` - Login with username/email and password
+- `POST /logout` - Logout
 
-- POST `/login`
-  - Body: `{ username, password }` (username can be username or email)
-  - On success: `{ email, role, department }` and sets session (`userEmail`, `userRole`, `userDepartment`).
+**Profile** (login required)
+- `GET /profile` - Get user info
+- `POST /update-salary` - Update salary
 
-- POST `/logout`
-  - Destroys session.
+**Timetable** (login required)
+- `GET /timetable` - View schedule
+- `POST /timetable/add` - Add a class
+- `DELETE /timetable/delete/:scheduleId` - Remove a class
 
-- GET `/profile` (auth required)
-  - Returns `{ username, email, department, role, max_leaves, total_leaves, salary }` for the logged-in user.
+**Leave** (login required)
+- `POST /apply-leave` - Request leave (checks for replacements)
 
-- GET `/timetable` (auth required)
-  - Returns the logged-in user’s timetable: `[{ schedule_id, day_of_week, start_time, end_time, subject, room_number }]`.
+## Getting Started
 
-- POST `/timetable/add` (auth required)
-  - Body: `{ day_of_week, start_time, end_time, subject, room_number }`
-  - Creates a timetable entry for the logged-in user.
-
-- DELETE `/timetable/delete/:scheduleId` (auth required)
-  - Deletes a timetable entry if it belongs to the logged-in user.
-
-- POST `/update-salary` (auth required)
-  - Body: `{ newSalary }`
-  - Updates the logged-in user’s salary (non-negative integer).
-
-- POST `/apply-leave` (auth required)
-  - Body: `{ type, startDate, endDate, reason }`
-  - Validates dates; for each day in the range, checks timetable and replacement availability; if all required replacements exist, inserts an approved leave and increments `total_leaves` by number of days.
-
-## Frontend Pages
-- [login-signup.html](login-signup.html): Entry page; links to login and signup.
-- [login-page.html](login-page.html): Sends `POST /login`, stores `email` and `role` in localStorage, then redirects to profile.
-- [signup-page.html](signup-page.html): Posts to `POST /signup` with client-side validation.
-- [profile.html](profile.html): Loads `GET /profile`; includes modals to call `POST /apply-leave` and `POST /update-salary`; link to timetable.
-- [timetable.html](timetable.html): Calls `GET /timetable`, `POST /timetable/add`, and `DELETE /timetable/delete/:scheduleId`.
-
-## Setup & Run
-Prerequisites: Node.js, MySQL.
-
-1) Install dependencies
+1. Install dependencies:
 ```bash
 npm install
 ```
 
-2) Configure environment
-- Create `.env` (see variables above).
+2. Create `.env` file with your database credentials
 
-3) Prepare database
-- Create the database and tables (see schema example) and ensure credentials match `.env`.
+3. Create the database and tables (see schema above)
 
-4) Start the server
+4. Run the server:
 ```bash
 node server.js
 ```
-- Server runs on `http://localhost:${PORT}` (default 5201).
 
-5) Open the app
-- Open [login-signup.html](login-signup.html) in a browser, or directly navigate to [login-page.html](login-page.html) / [signup-page.html](signup-page.html).
+5. Open http://localhost:5201 in your browser
 
-## Notes & Recommendations
-- Sessions: Current setup uses the default in-memory store; use a persistent session store (e.g., Redis) for production.
-- CORS: Enabled globally via `cors()`.
-- Static files: Served from the project root via `express.static(__dirname)`.
-- Security: Do not commit `.env`; set a strong `SESSION_SECRET`.
-- Consistent installs: Use `npm ci` in CI to honor `package-lock.json`.
+## Notes
+- Uses in-memory sessions (for development only)
+- Keep `.env` private—don't commit it
